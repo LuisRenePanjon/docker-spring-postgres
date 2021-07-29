@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+  srvdb:
+    image: postgres:12-alpine
+    container_name: srvdb
+    hostname: srvdb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: products_db
+    ports:
+      - 5432:5432
+    networks: 
+      - distribuid2
+    volumes:
+      - pg_data2:/var/lib/postgresql/data
+
+  srvtomcat:
+    image : app-products:v6
+    container_name: srvtomcat
+    hostname: srvtomcat
+    command: catalina.sh run
+    depends_on:
+      - srvdb
+    networks:
+      - distribuid2
+
+  srvtomcat2:
+    image: app-products:v6
+    container_name: srvtomcat2
+    hostname: srvtomcat2
+    command: catalina.sh run
+    depends_on:
+      - srvdb
+    networks:
+      - distribuid2
+
+  srvweb:
+    image: custom-nginx:v1
+    container_name: srvweb
+    hostname: srvweb
+    ports:
+      - 8888:80
+    networks:
+      - distribuid2
+
+volumes: 
+  pg_data2: 
+    driver: local
+    driver_opts: 
+      o: bind
+      type: none
+      device: /home/renepb/pgdata/
+
+networks: 
+  distribuid2:
+
+  
+    
